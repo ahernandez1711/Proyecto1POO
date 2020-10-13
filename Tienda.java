@@ -38,11 +38,16 @@ public class Tienda implements ActionListener{
         this.GUI.BtnArmaEquipar.addActionListener(this);
         this.GUI.BtnYelmoEquipar.addActionListener(this);
         this.GUI.BtnPecheraEquipar.addActionListener(this);
+        this.GUI.BtnVenderYelmo.addActionListener(this);
+        this.GUI.BtnVenderPechera.addActionListener(this);
+        this.GUI.BtnVenderArma.addActionListener(this);
         GUI.LblStatAtaque.setText(Main.StatAtaque+"");
         GUI.LblStatDefensa.setText(Main.StatDefensa+"");
         GUI.LblStatVida.setText(Main.StatVida+"");
         GUI.LblStatMana.setText(Main.StatMana+"");
         GUI.LblStatCrit.setText(Main.StatCrit+"%");
+        GUI.LblEquipado.setText("0");
+        GUI.LblInventario.setText("0");
         _init_();
          generarBotones(GUI.PnlYelmos, FondoPecheras, FondoArmas,4 , 4);
          GUI.repaint();
@@ -50,11 +55,11 @@ public class Tienda implements ActionListener{
     }
     public void _init_() throws IOException{
         GUI.PnlPecheras.setSize(600, 225);
-        GUI.PnlPecheras.setLocation(0, 225);
+        GUI.PnlPecheras.setLocation(0, 250);
         GUI.PnlFondo.add(GUI.PnlPecheras);
         Dinero();
         GUI.PnlArmas.setSize(600, 225);
-        GUI.PnlArmas.setLocation(0, 450);
+        GUI.PnlArmas.setLocation(0, 475);
         GUI.PnlFondo.add(GUI.PnlArmas);
         GUI.PnlYelmos.setBackground(Color.BLACK);
         GUI.PnlArmas.setBackground(Color.BLUE);
@@ -75,7 +80,7 @@ public class Tienda implements ActionListener{
                     Btn.setFont(new java.awt.Font("Tahoma",0,9));
                     Btn.setSize(200, 50);
                     Btn.setText(PLH.Nombre);
-                    Btn.setLocation((200*i)-200,50*j);
+                    Btn.setLocation((200*i)-200,50*j+25);
                     FondoA.add(Btn);
                 }
             
@@ -91,7 +96,7 @@ public class Tienda implements ActionListener{
                     this.EstanteriaDePechera.add(PLH);
                     Btn2.addActionListener(this);                    
                     Btn2.setSize(200, 50);                    
-                    Btn2.setLocation((200*i)-200,50*j);
+                    Btn2.setLocation((200*i)-200,50*j+25);
                     Btn2.setText(PLH.Nombre);
 
                     FondoB.add(Btn2);
@@ -109,7 +114,7 @@ public class Tienda implements ActionListener{
                     this.ListaArmas.add(Btn);
                     Btn.addActionListener(this);
                      FondoC.add(Btn);
-                    Btn.setLocation((200*i)-200,50*j);
+                    Btn.setLocation((200*i)-200,50*j+25);
                     Btn.setSize(200, 50);
                     Btn.setText(PLH.Nombre);
                 }
@@ -128,6 +133,8 @@ public class Tienda implements ActionListener{
             this.GUI.LblItemAtaque.setText("+"+this.EstanteriaDeArmas.get(i).StatAtaque);
             this.GUI.LblItemCritico.setText("+"+this.EstanteriaDeArmas.get(i).StatCrit+"%");
             this.GUI.LblPrecio.setText(""+this.EstanteriaDeArmas.get(i).Costo);
+            this.GUI.LblEquipado.setText(cuantasArmasEquipado(this.EstanteriaDeArmas.get(i).Nombre)+"");
+            this.GUI.LblInventario.setText(cuantasArmasAlforja(this.EstanteriaDeArmas.get(i).Nombre)+"");
             for (int j = 0; j < this.ListaYelmos.size(); j++) {
                  ListaYelmos.get(j).setEnabled(true);
              }
@@ -150,6 +157,8 @@ public class Tienda implements ActionListener{
             this.GUI.LblItemMana.setText("+0");
             this.GUI.LblItemAtaque.setText("+0");
             this.GUI.LblItemCritico.setText("+0%");
+            this.GUI.LblEquipado.setText(cuantasPecherasEquipado(this.EstanteriaDePechera.get(i).Nombre)+"");
+            this.GUI.LblInventario.setText(cuantasPecherasAlforja(this.EstanteriaDePechera.get(i).Nombre)+"");
             this.GUI.LblPrecio.setText(this.EstanteriaDePechera.get(i).Costo+"");
             for (int j = 0; j < this.ListaArmas.size(); j++) {
                  ListaArmas.get(j).setEnabled(true);
@@ -175,6 +184,8 @@ public class Tienda implements ActionListener{
             this.GUI.LblItemAtaque.setText("+0");
             this.GUI.LblItemCritico.setText("+0%");
             this.GUI.LblPrecio.setText(this.EstanteriaDeYelmos.get(i).Costo+"");
+            this.GUI.LblEquipado.setText(cuantosYelmoEquipado(this.EstanteriaDeYelmos.get(i).Nombre)+"");
+            this.GUI.LblInventario.setText(cuantosYelmoAlforja(this.EstanteriaDeYelmos.get(i).Nombre)+"");
              for (int j = 0; j < this.ListaArmas.size(); j++) {
                  ListaArmas.get(j).setEnabled(true);
              }
@@ -203,6 +214,7 @@ public class Tienda implements ActionListener{
                 GUI.LblStatVida.setText(Main.StatVida+"");
                 GUI.LblStatMana.setText(Main.StatMana+"");
                 GUI.LblStatCrit.setText(Main.StatCrit+"%");
+                
             } catch(NullPointerException f){
                 Main.Cabeza=YItem;
                 Main.StatDefensa+=YItem.StatDefensa;
@@ -265,7 +277,77 @@ public class Tienda implements ActionListener{
             }
         
         
-        }
+        } else if(e.getSource().equals(GUI.BtnVenderYelmo)){
+            
+                
+           
+                Yelmo YItem= getYelmo(this.GUI.CbxYelmo.getItemAt(this.GUI.CbxYelmo.getSelectedIndex()));
+                System.out.println("Salida");
+                Main.dinero+=(YItem.Costo/2);
+                try{
+                if(YItem.Nombre.compareTo(Main.Cabeza.Nombre)==0){
+                    Main.StatDefensa-=Main.Cabeza.StatDefensa;
+                    Main.StatMana-=Main.Cabeza.StatMana;
+                    Main.Cabeza=null;
+                }
+                }
+                catch(NullPointerException j){
+                    
+                }
+                this.GUI.CbxYelmo.removeItemAt(this.GUI.CbxYelmo.getSelectedIndex());
+                Dinero();
+                GUI.LblStatAtaque.setText(Main.StatAtaque+"");
+                GUI.LblStatDefensa.setText(Main.StatDefensa+"");
+                GUI.LblStatVida.setText(Main.StatVida+"");
+                GUI.LblStatMana.setText(Main.StatMana+"");
+                GUI.LblStatCrit.setText(Main.StatCrit+"%");
+            } else if(e.getSource().equals(GUI.BtnVenderPechera)){
+                Pechera PItem= getPechera(this.GUI.CbxPechera.getItemAt(this.GUI.CbxPechera.getSelectedIndex()));
+                System.out.println("Salida");
+                Main.dinero+=(PItem.Costo/2);
+                try{
+                if(PItem.Nombre.compareTo(Main.Pecho.Nombre)==0){
+                    Main.StatDefensa-=Main.Pecho.StatDefensa;
+                    Main.StatVida-=Main.Pecho.StatVida;
+                    Main.Pecho=null;
+                }
+                }
+                catch(NullPointerException j){
+                    
+                }
+                this.GUI.CbxPechera.removeItemAt(this.GUI.CbxPechera.getSelectedIndex());
+                Dinero();
+                GUI.LblStatAtaque.setText(Main.StatAtaque+"");
+                GUI.LblStatDefensa.setText(Main.StatDefensa+"");
+                GUI.LblStatVida.setText(Main.StatVida+"");
+                GUI.LblStatMana.setText(Main.StatMana+"");
+                GUI.LblStatCrit.setText(Main.StatCrit+"%");
+            } else if(e.getSource().equals(GUI.BtnVenderArma)){
+                Arma AItem= getArma(this.GUI.CbxArma.getItemAt(this.GUI.CbxArma.getSelectedIndex()));
+                Main.dinero+=(AItem.Costo/2);
+                try{
+                if(AItem.Nombre.compareTo(Main.Espada.Nombre)==0){
+                    Main.StatAtaque-=Main.Espada.StatAtaque;
+                    Main.StatCrit-=Main.Espada.StatCrit;
+                    Main.Espada=null;
+                }
+                }
+                catch(NullPointerException j){
+                    
+                }
+                this.GUI.CbxArma.removeItemAt(this.GUI.CbxArma.getSelectedIndex());
+                Dinero();
+                GUI.LblStatAtaque.setText(Main.StatAtaque+"");
+                GUI.LblStatDefensa.setText(Main.StatDefensa+"");
+                GUI.LblStatVida.setText(Main.StatVida+"");
+                GUI.LblStatMana.setText(Main.StatMana+"");
+                GUI.LblStatCrit.setText(Main.StatCrit+"%");
+            }
+            
+        
+    
+            
+           
         
         
 }
@@ -338,5 +420,73 @@ public Arma getArma(String Item){
 }
 public void Dinero(){
     this.GUI.LblDinero.setText(Main.dinero+"");
+}
+public int cuantosYelmoAlforja(String SYelmo){
+    int contador=0;
+    for (int i = 0; i < Main.AlforjaDeYelmos.size(); i++) {
+        Yelmo get = Main.AlforjaDeYelmos.get(i);
+        if(SYelmo.compareTo(get.Nombre)==0){
+            contador++;
+        }
+        
+    }
+    return contador;
+}
+public int cuantosYelmoEquipado(String SYelmo){
+    try{
+        if(SYelmo.compareTo(Main.Cabeza.Nombre)==0){
+            return 1;
+        }else{
+            return 0;
+        }
+    }
+    catch(NullPointerException j){
+        return 0;
+    }
+}    
+public int cuantasPecherasAlforja(String SPechera){
+    int contador=0;
+    for (int i = 0; i < Main.AlforjaDePecheras.size(); i++) {
+        Pechera get = Main.AlforjaDePecheras.get(i);
+        if(SPechera.compareTo(get.Nombre)==0){
+            contador++;
+        }
+        
+    }
+    return contador;
+}
+public int cuantasPecherasEquipado(String SPechera){
+    try{
+        if(SPechera.compareTo(Main.Pecho.Nombre)==0){
+            return 1;
+        }else{
+            return 0;
+        }
+    }
+    catch(NullPointerException j){
+        return 0;
+    }
+}    
+public int cuantasArmasAlforja(String SArmas){
+    int contador=0;
+    for (int i = 0; i < Main.AlforjaDeArmas.size(); i++) {
+        Arma get = Main.AlforjaDeArmas.get(i);
+        if(SArmas.compareTo(get.Nombre)==0){
+            contador++;
+        }
+        
+    }
+    return contador;
+}
+public int cuantasArmasEquipado(String SArmas){
+        try{
+        if(SArmas.compareTo(Main.Espada.Nombre)==0){
+            return 1;
+        }else{
+            return 0;
+        }
+        }catch(NullPointerException j){
+            return 0;
+        }
 }
 }
